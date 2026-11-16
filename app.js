@@ -451,11 +451,34 @@ function loadSavedProgress() {
   try {
     const raw = localStorage.getItem('bootrescuelab_progress_v1');
     if (!raw) return {};
-    const parsed = JSON.parse(raw);
-    return parsed && typeof parsed === 'object' ? parsed : {};
+    return sanitizeSavedProgress(JSON.parse(raw));
   } catch {
     return {};
   }
+}
+
+/**
+ * Solo acepta casos que existen y cuya flag es la del propio caso: antes cualquier clave
+ * o bandera inventada en localStorage contaba como resuelta (p. ej. «3 / 3» sin jugar).
+ * @param {unknown} parsed
+ * @returns {Record<string, SolvedRecord>}
+ */
+function sanitizeSavedProgress(parsed) {
+  /** @type {Record<string, SolvedRecord>} */
+  const clean = {};
+  if (!parsed || typeof parsed !== 'object') return clean;
+  SCENARIOS.forEach((scenario) => {
+    const record = /** @type {Record<string, unknown>} */ (parsed)[scenario.id];
+    if (!record || typeof record !== 'object' || record.flag !== scenario.flag) return;
+    const score = Number(record.score);
+    const commandsUsed = Number(record.commandsUsed);
+    clean[scenario.id] = {
+      flag: scenario.flag,
+      score: Number.isFinite(score) ? Math.min(1000, Math.max(500, Math.round(score))) : 500,
+      commandsUsed: Number.isFinite(commandsUsed) ? Math.max(0, Math.round(commandsUsed)) : 0,
+    };
+  });
+  return clean;
 }
 
 /**
