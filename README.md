@@ -1,10 +1,36 @@
+<div align="center">
+  <a href="https://www.unfantasmaenelsistema.com/">
+    <img src="./public/assets/logo.png" alt="Logo de Un Fantasma en el Sistema — GhostAcademy" width="88" />
+  </a>
+
 # BootRescueLab — GhostAcademy
+
+[![Probar en GitHub Pages](https://img.shields.io/badge/Probar-en%20el%20navegador-0284c7?style=flat-square&logo=github)](https://unfantasmaenelsistema.github.io/BootRescueLab/)
+[![Vanilla JS + Tailwind 4](https://img.shields.io/badge/Stack-Vanilla%20JS%20%2B%20Tailwind%204-10b981?style=flat-square)](#estructura-del-proyecto)
+[![Licencia MIT](https://img.shields.io/badge/Licencia-MIT-f59e0b?style=flat-square)](./LICENSE)
+
+**[▶ Abrir el laboratorio](https://unfantasmaenelsistema.github.io/BootRescueLab/)**
+</div>
 
 Laboratorio educativo interactivo **100% cliente-estático** (HTML5, Tailwind CSS y Vanilla JavaScript) diseñado para practicar el diagnóstico y la reparación de fallos críticos de arranque en **Windows PE** y **GNU GRUB Rescue**, desarrollado para el portal **[GhostAcademy — Un Fantasma en el Sistema](https://www.unfantasmaenelsistema.com/)**.
 
 ---
 
+## Tabla de contenidos
+
+- [Capturas reales de la aplicación](#capturas-reales-de-la-aplicación)
+- [Características principales](#características-principales)
+- [Escenarios incluidos](#escenarios-incluidos)
+- [Estructura del proyecto](#estructura-del-proyecto)
+- [Desarrollo local y despliegue en GitHub Pages](#desarrollo-local-y-despliegue-en-github-pages)
+- [Novedades de la versión 2](#novedades-de-la-versión-2)
+- [Autoría y licencia](#autoría-y-licencia)
+
+---
+
 ## Capturas reales de la aplicación
+
+> Capturas de la versión 2 tomadas sobre la compilación de producción, ejecutando los comandos de verdad en la consola.
 
 ### 1. Caso 1 — MBR Corrupto en Windows PE y Visualizador de Disco en vivo
 El panel izquierdo muestra el estado físico del **Disco 0**, la secuencia de arranque paso a paso y el bloque `Sector 0 (MBR)` en alerta roja hasta que el alumno lo repara desde la consola interactiva.
@@ -42,7 +68,7 @@ En pantallas estrechas la consola interactiva se apila debajo del panel de diagn
   - **GRUB Rescue (`grub rescue>`):** `ls`, `ls (hdX,Y)/ruta`, `cat (hdX,Y)/boot/grub/grub.cfg`, `set`, `set root=...`, `set prefix=...`, `insmod normal`, `normal`, `clear`, `history`, `reboot`.
   - **Productividad de terminal:** Autocompletado con `Tab`, historial con `↑`/`↓`, limpieza rápida con `Ctrl+L` y scroll automático.
 - **Motor CTF y herramientas educativas:**
-  - Verificación automática de resolución por escenario, puntuación dinámica, flags copiables y persistencia de progreso en `localStorage`.
+  - Verificación automática de resolución por escenario, puntuación dinámica, flags copiables y persistencia de progreso en `localStorage`. Al cargar el progreso solo se aceptan los casos que existen y cuya flag es la del propio caso, así que editar `localStorage` no marca casos como resueltos.
   - **Pistas progresivas** opcionales (3 niveles por caso) y **chuleta técnica interactiva** con inserción directa en consola.
 - **Efectos de sonido sutiles (Web Audio API):** Pulsaciones de teclado, confirmación de reparación, error y fanfarria CTF sin archivos externos, activable o silenciable desde la barra de consola.
 
@@ -63,16 +89,16 @@ En pantallas estrechas la consola interactiva se apila debajo del panel de diagn
 ```text
 BootRescueLab/
 ├── index.html                    # Estructura principal, paneles educativos, modal CTF y footer
-├── styles.css                    # Tailwind CSS v4, temas de terminal y animaciones de sectores
+├── styles.css                    # Tailwind CSS v4 (compilado en el build), temas de terminal y animaciones
 ├── app.js                        # Motor de escenarios, simulador WinPE/GRUB, Web Audio y Visualizador
 ├── public/
-│   └── assets/aistudio/          # Logotipo oficial de GhostAcademy
+│   └── assets/logo.png           # Logotipo de GhostAcademy (también favicon)
 ├── docs/
 │   └── screenshots/              # Capturas reales de la aplicación para documentación
 ├── .github/workflows/
 │   └── deploy.yml                # Despliegue automático a GitHub Pages
-├── package.json
-├── vite.config.ts                # Configurado con base: './' para rutas relativas en GitHub Pages
+├── package.json / bun.lock       # Dependencias de compilación (Bun)
+├── vite.config.js                # base: './' para rutas relativas en GitHub Pages
 └── LICENSE
 ```
 
@@ -80,27 +106,27 @@ BootRescueLab/
 
 ## Desarrollo local y despliegue en GitHub Pages
 
-### Requisitos
-- Node.js 20 o superior.
+Requisitos: **[Bun](https://bun.sh/)** (el proyecto usa `bun.lock`).
 
-### Ejecutar en local
 ```bash
-npm install
-npm run dev
+git clone https://github.com/unfantasmaenelsistema/BootRescueLab.git
+cd BootRescueLab
+bun install
+bun run dev        # http://localhost:3000
+bun run build      # genera ./dist para publicar
 ```
-La aplicación quedará disponible en `http://localhost:3000`.
 
-### Compilar versión estática
-```bash
-npm run build
-```
-Generará los archivos estáticos optimizados en la carpeta `dist/`.
+Abrir `index.html` directamente no basta: los estilos de Tailwind se generan al compilar.
 
-### Publicar en GitHub Pages
-Este repositorio incluye el flujo automático `.github/workflows/deploy.yml`:
-1. Sube el proyecto a la rama `main` de tu repositorio en GitHub.
-2. En **Settings → Pages → Build and deployment**, selecciona **GitHub Actions** como origen (*Source*).
-3. Cada `git push` a `main` compilará `dist/` y publicará la web automáticamente.
+El flujo [`.github/workflows/deploy.yml`](./.github/workflows/deploy.yml) se ejecuta en cada `push` a `main`: instala con Bun (`bun install --frozen-lockfile`), compila `./dist` y lo publica en https://unfantasmaenelsistema.github.io/BootRescueLab/ (en **Settings → Pages**, la fuente es **GitHub Actions**).
+
+---
+
+## Novedades de la versión 2
+
+- **Publicado en GitHub Pages.** El workflow fallaba en segundos (`npm ci` sin `package-lock.json`) y Pages no estaba activado. Ahora compila con Bun y publica.
+- **Progreso CTF que no se puede inventar.** Cualquier clave o flag escrita a mano en `localStorage` contaba como caso resuelto (se llegaba a «3 / 3» sin jugar). Ahora solo cuentan los tres casos reales con su flag correcta.
+- **Limpieza.** Fuera React, Gemini, Express, `motion`, `lucide-react`, TypeScript y el plugin de copia de AI Studio, que la app (HTML + JavaScript) no usaba, además de `metadata.json` y `.env.example`. El logo pasa a `public/assets/logo.png` y es también el favicon. El aspecto no cambia: lo he comparado píxel a píxel en los tres casos y en la pantalla de victoria, en escritorio y en móvil.
 
 ---
 
