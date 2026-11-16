@@ -1,0 +1,620 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BootRescueLab — GhostAcademy</title>
+    <meta
+      name="description"
+      content="Laboratorio educativo interactivo de diagnóstico y consola de rescate de arranque (Windows PE y GRUB Rescue) para el portal GhostAcademy."
+    />
+    <meta property="og:title" content="BootRescueLab — GhostAcademy" />
+    <meta
+      property="og:description"
+      content="Laboratorio educativo interactivo de diagnóstico y consola de rescate de arranque (Windows PE y GRUB Rescue) para el portal GhostAcademy."
+    />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body class="min-h-screen bg-[#f4f6f8] text-slate-900 lg:h-screen lg:overflow-hidden">
+    <div id="app-shell" class="mx-auto flex min-h-screen w-full max-w-[1600px] flex-col lg:h-screen">
+      <!-- Top Bar: GhostAcademy + BootRescueLab + Portal Web Link -->
+      <header
+        class="flex shrink-0 items-center justify-between gap-2 border-b border-slate-200 bg-white px-3 py-2.5 sm:gap-4 sm:px-6 sm:py-3"
+      >
+        <div class="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
+          <div
+            class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white p-1 sm:h-10 sm:w-10"
+          >
+            <img
+              src="./assets/aistudio/icono_81a3db5b.png"
+              alt="Logo de GhostAcademy — Un Fantasma en el Sistema"
+              referrerpolicy="no-referrer"
+              class="h-full w-full object-contain"
+            />
+          </div>
+          <div class="flex min-w-0 flex-col sm:flex-row sm:items-baseline sm:gap-x-2.5">
+            <span class="truncate text-[10px] font-semibold leading-tight tracking-tight text-slate-500 sm:text-sm">
+              GhostAcademy
+            </span>
+            <span class="hidden text-slate-300 sm:inline" aria-hidden="true">/</span>
+            <h1 class="truncate text-sm font-bold leading-tight tracking-tight text-slate-900 sm:text-xl">
+              BootRescueLab
+            </h1>
+          </div>
+        </div>
+
+        <nav aria-label="Portal principal" class="flex shrink-0 items-center">
+          <a
+            href="https://www.unfantasmaenelsistema.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex min-h-8 items-center gap-1 whitespace-nowrap rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 text-[10px] font-semibold text-slate-700 transition-colors hover:border-sky-300 hover:bg-sky-50 hover:text-sky-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 sm:min-h-10 sm:gap-1.5 sm:px-3.5 sm:py-2 sm:text-sm"
+          >
+            <span>unfantasmaenelsistema.com</span>
+            <svg
+              class="h-3.5 w-3.5 shrink-0 text-slate-400"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+              <polyline points="15 3 21 3 21 9" />
+              <line x1="10" y1="14" x2="21" y2="3" />
+            </svg>
+          </a>
+        </nav>
+      </header>
+
+      <!-- Workspace Principal: Dos Paneles (Izquierdo: Educativo/Estado · Derecho: Consola) -->
+      <main class="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-12">
+        <!-- PANEL IZQUIERDO: Selector, Ticket y Estado del Disco -->
+        <section
+          aria-label="Panel educativo y estado del disco"
+          class="lab-scroll flex min-h-0 flex-col gap-6 border-b border-slate-200 bg-white p-4 sm:p-6 lg:col-span-6 lg:overflow-y-auto lg:border-r lg:border-b-0 xl:col-span-6"
+        >
+          <!-- 1. Selector de escenarios de avería -->
+          <div>
+            <div class="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+              <h2 class="text-sm font-semibold tracking-tight text-slate-900">
+                01. Escenarios de soporte técnico
+              </h2>
+              <div class="flex flex-wrap items-center gap-3 text-xs text-slate-500">
+                <span id="ctf-progress" class="font-mono font-medium text-slate-700 tabular-nums">
+                  0 / 3 resueltos
+                </span>
+                <button
+                  type="button"
+                  id="btn-reopen-victory"
+                  class="hidden cursor-pointer font-semibold text-emerald-700 underline underline-offset-2 hover:text-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+                >
+                  Ver flag
+                </button>
+                <button
+                  type="button"
+                  id="btn-reset-progress"
+                  class="hidden cursor-pointer font-medium text-slate-500 underline underline-offset-2 hover:text-red-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+                >
+                  Reiniciar progreso
+                </button>
+              </div>
+            </div>
+
+            <div
+              id="scenario-selector"
+              role="tablist"
+              aria-label="Selector de escenarios de avería"
+              class="grid grid-cols-1 gap-2 sm:grid-cols-3"
+            >
+              <!-- Renderizado dinámico desde app.js -->
+            </div>
+          </div>
+
+          <hr class="border-slate-200" />
+
+          <!-- 2. Área de descripción del ticket de soporte -->
+          <article aria-labelledby="ticket-title">
+            <div class="mb-2 flex flex-wrap items-center justify-between gap-2">
+              <div class="flex flex-wrap items-center gap-2 text-xs text-slate-500">
+                <span id="ticket-id" class="font-mono font-semibold text-slate-800"></span>
+                <span aria-hidden="true">·</span>
+                <span id="ticket-env"></span>
+                <span aria-hidden="true">·</span>
+                <span id="ticket-firmware"></span>
+                <span aria-hidden="true">·</span>
+                <span id="ticket-error-code" class="font-mono text-red-700"></span>
+              </div>
+            </div>
+
+            <h2 id="ticket-title" class="text-balance text-lg font-bold tracking-tight text-slate-900"></h2>
+            <p id="ticket-summary" class="mt-2 text-sm leading-relaxed text-slate-600"></p>
+
+            <div class="mt-4 grid grid-cols-1 gap-3 border-t border-slate-100 pt-4 sm:grid-cols-2">
+              <div>
+                <h3 class="text-xs font-semibold text-slate-500">Síntoma reportado</h3>
+                <p id="ticket-symptom" class="mt-1 text-sm leading-relaxed text-slate-700"></p>
+              </div>
+              <div>
+                <h3 class="text-xs font-semibold text-slate-500">Resolución esperada</h3>
+                <p id="ticket-objective" class="mt-1 text-sm leading-relaxed text-slate-700"></p>
+              </div>
+            </div>
+
+            <!-- Pistas progresivas opcionales -->
+            <div class="mt-3.5 border-t border-slate-100 pt-3">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <span class="text-xs font-medium text-slate-500">
+                  ¿Necesitas orientación técnica?
+                </span>
+                <button
+                  type="button"
+                  id="btn-reveal-hint"
+                  class="cursor-pointer text-xs font-semibold text-sky-700 underline underline-offset-2 hover:text-sky-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+                >
+                  Mostrar pista (0/3)
+                </button>
+              </div>
+              <ol id="hint-list" class="mt-2 hidden space-y-1.5 text-xs leading-relaxed text-slate-700"></ol>
+            </div>
+          </article>
+
+          <hr class="border-slate-200" />
+
+          <!-- 3. Visualizador gráfico del estado del disco duro (MBR/GPT, EFI, Particiones) -->
+          <section aria-labelledby="disk-section-title" class="flex flex-col gap-3.5">
+            <div class="flex flex-wrap items-baseline justify-between gap-2">
+              <div>
+                <h2 id="disk-section-title" class="text-sm font-semibold tracking-tight text-slate-900">
+                  02. Visualizador de Disco
+                </h2>
+                <p id="disk-hardware-meta" class="mt-0.5 font-mono text-xs text-slate-500"></p>
+              </div>
+              <span class="text-xs text-slate-500">Haz clic en un bloque o partición para inspeccionar</span>
+            </div>
+
+            <!-- Bloque contenedor del Disco 0 -->
+            <div
+              id="disk-visualizer-card"
+              class="rounded-xl border border-slate-200 bg-slate-50/70 p-3.5 sm:p-4"
+            >
+              <!-- Cabecera de unidad física + estado general -->
+              <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3">
+                <div class="flex items-center gap-2.5">
+                  <div
+                    class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-700"
+                    aria-hidden="true"
+                  >
+                    <svg
+                      class="h-4 w-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <line x1="22" y1="12" x2="2" y2="12" />
+                      <path
+                        d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"
+                      />
+                      <line x1="6" y1="16" x2="6.01" y2="16" />
+                      <line x1="10" y1="16" x2="10.01" y2="16" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <span class="font-mono text-xs font-bold text-slate-900">DISCO 0</span>
+                      <span aria-hidden="true" class="text-slate-300">·</span>
+                      <span id="disk-scheme-label" class="text-xs font-medium text-slate-600"></span>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  id="disk-overall-status"
+                  class="flex items-center gap-1.5 text-xs font-semibold text-red-700"
+                  aria-live="polite"
+                >
+                  <!-- Renderizado dinámico desde app.js -->
+                </div>
+              </div>
+
+              <!-- Cadena visual de secuencia de arranque -->
+              <div class="mt-3">
+                <div class="mb-1.5 text-[11px] font-semibold text-slate-500">
+                  Secuencia de arranque en tiempo real
+                </div>
+                <div
+                  id="disk-boot-chain"
+                  class="grid grid-cols-2 gap-1.5 sm:grid-cols-4"
+                  aria-label="Secuencia de arranque del disco"
+                >
+                  <!-- Renderizado dinámico desde app.js -->
+                </div>
+              </div>
+
+              <!-- Bloques críticos de cabecera: Sector 0 (MBR) / GPT / EFI / GRUB -->
+              <div id="disk-boot-structures" class="mt-3 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+                <!-- Renderizado dinámico desde app.js -->
+              </div>
+
+              <!-- Mapa físico de sectores y particiones -->
+              <div class="mt-3 rounded-lg border border-slate-200 bg-white p-3">
+                <div class="mb-2 flex items-center justify-between text-xs text-slate-500">
+                  <span class="font-mono">LBA 0</span>
+                  <span class="font-medium text-slate-600">Mapa físico de sectores</span>
+                  <span id="disk-total-lba" class="font-mono"></span>
+                </div>
+
+                <div
+                  id="disk-partition-bar"
+                  class="flex min-h-[78px] w-full flex-col gap-1.5 sm:flex-row sm:items-stretch"
+                >
+                  <!-- Bloque LBA 0 + Particiones renderizadas dinámicamente -->
+                </div>
+
+                <div class="mt-2.5 flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-2 text-[11px] text-slate-500">
+                  <div class="flex flex-wrap items-center gap-3">
+                    <span class="inline-flex items-center gap-1 font-medium text-emerald-700">
+                      <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                      Íntegro
+                    </span>
+                    <span class="inline-flex items-center gap-1 font-medium text-amber-700">
+                      <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                      </svg>
+                      Advertencia
+                    </span>
+                    <span class="inline-flex items-center gap-1 font-medium text-red-700">
+                      <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="15" y1="9" x2="9" y2="15" />
+                        <line x1="9" y1="9" x2="15" y2="15" />
+                      </svg>
+                      Corrupto / Error
+                    </span>
+                  </div>
+                  <span class="font-mono text-slate-400">Sector 512B</span>
+                </div>
+              </div>
+
+              <!-- Inspector del bloque / partición seleccionada -->
+              <div
+                id="partition-inspector"
+                class="mt-3 rounded-lg border border-slate-200 bg-white p-3.5 sm:p-4"
+                aria-live="polite"
+              >
+                <!-- Renderizado dinámico desde app.js -->
+              </div>
+            </div>
+          </section>
+
+          <!-- 4. Guía rápida de comandos del entorno activo -->
+          <details
+            id="command-reference"
+            class="rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-xs text-slate-700"
+          >
+            <summary class="flex cursor-pointer list-none items-center justify-between gap-3 font-semibold text-slate-900 select-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600">
+              <span>03. Chuleta técnica de comandos</span>
+              <span class="shrink-0 whitespace-nowrap font-mono text-[11px] font-medium text-sky-700">Expandir / Ocultar</span>
+            </summary>
+            <div id="command-reference-list" class="mt-3 space-y-2 border-t border-slate-200 pt-3">
+              <!-- Renderizado dinámico desde app.js -->
+            </div>
+          </details>
+        </section>
+
+        <!-- PANEL DERECHO: Emulador de Consola Interactiva -->
+        <section
+          aria-label="Consola interactiva de rescate"
+          class="flex min-h-[500px] flex-col bg-[#0c0c0c] p-3 sm:p-4 lg:col-span-6 lg:min-h-0 xl:col-span-6"
+        >
+          <div
+            id="terminal-shell"
+            class="terminal-shell theme-winpe is-focused flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border border-neutral-800 shadow-sm"
+          >
+            <!-- Barra superior de la ventana de terminal -->
+            <div class="terminal-chrome flex shrink-0 flex-wrap items-center justify-between gap-2 px-3.5 py-2.5">
+              <div class="flex min-w-0 flex-1 items-center gap-2.5">
+                <svg
+                  class="h-4 w-4 shrink-0 opacity-80"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <polyline points="4 17 10 11 4 5" />
+                  <line x1="12" y1="19" x2="20" y2="19" />
+                </svg>
+                <span id="terminal-window-title" class="truncate font-mono text-xs font-medium">
+                  Administrador: X:\windows\system32\cmd.exe — Windows PE
+                </span>
+              </div>
+
+              <div class="flex shrink-0 items-center gap-1.5">
+                <button
+                  type="button"
+                  id="btn-sound-toggle"
+                  aria-pressed="true"
+                  aria-label="Alternar efectos de sonido"
+                  class="inline-flex min-h-8 cursor-pointer items-center gap-1.5 whitespace-nowrap shrink-0 rounded border border-neutral-700 bg-neutral-900 px-2.5 py-1 text-xs font-medium text-neutral-200 transition-colors hover:border-neutral-500 hover:bg-neutral-800 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-sky-500"
+                >
+                  <svg
+                    id="sound-icon-on"
+                    class="h-3.5 w-3.5 shrink-0 text-emerald-400"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                    <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                  </svg>
+                  <svg
+                    id="sound-icon-off"
+                    class="hidden h-3.5 w-3.5 shrink-0 text-neutral-400"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                    <line x1="23" y1="9" x2="17" y2="15" />
+                    <line x1="17" y1="9" x2="23" y2="15" />
+                  </svg>
+                  <span id="sound-toggle-label">Sonido</span>
+                </button>
+                <button
+                  type="button"
+                  id="btn-cmd-help"
+                  class="min-h-8 cursor-pointer whitespace-nowrap shrink-0 rounded border border-neutral-700 bg-neutral-900 px-2.5 py-1 font-mono text-xs text-neutral-200 transition-colors hover:border-neutral-500 hover:bg-neutral-800 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-sky-500"
+                >
+                  help
+                </button>
+                <button
+                  type="button"
+                  id="btn-cmd-clear"
+                  class="min-h-8 cursor-pointer whitespace-nowrap shrink-0 rounded border border-neutral-700 bg-neutral-900 px-2.5 py-1 font-mono text-xs text-neutral-200 transition-colors hover:border-neutral-500 hover:bg-neutral-800 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-sky-500"
+                >
+                  cls
+                </button>
+                <button
+                  type="button"
+                  id="btn-terminal-reset"
+                  class="min-h-8 cursor-pointer whitespace-nowrap shrink-0 rounded border border-neutral-700 bg-neutral-900 px-2.5 py-1 text-xs font-medium text-neutral-200 transition-colors hover:border-neutral-500 hover:bg-neutral-800 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-sky-500"
+                >
+                  Reiniciar
+                </button>
+              </div>
+            </div>
+
+            <!-- Área desplazable del terminal -->
+            <div
+              id="terminal-viewport"
+              class="terminal-scroll relative min-h-0 flex-1 cursor-text overflow-y-auto p-4 font-mono text-[13.5px] leading-relaxed sm:p-5 sm:text-sm"
+              tabindex="0"
+              role="region"
+              aria-label="Salida e entrada de comandos de la terminal"
+            >
+              <div id="terminal-output" class="space-y-1 whitespace-pre-wrap break-words" aria-live="polite"></div>
+
+              <!-- Línea activa del prompt -->
+              <div
+                id="terminal-prompt-line"
+                class="relative mt-1 flex flex-wrap items-baseline whitespace-pre-wrap break-all"
+              >
+                <span id="terminal-prompt-label" class="terminal-line-prompt mr-2 shrink-0 select-none font-medium">
+                  X:\Sources&gt;
+                </span>
+                <span class="relative inline-flex min-w-[2ch] flex-1 items-baseline">
+                  <span id="terminal-mirror-before" class="whitespace-pre-wrap"></span><span
+                    id="terminal-cursor"
+                    class="terminal-cursor"
+                    aria-hidden="true"
+                  ></span><span id="terminal-mirror-after" class="whitespace-pre-wrap"></span>
+                </span>
+
+                <input
+                  id="terminal-input"
+                  type="text"
+                  autocomplete="off"
+                  autocapitalize="off"
+                  autocorrect="off"
+                  spellcheck="false"
+                  aria-label="Línea de comandos de la terminal"
+                  class="terminal-input-overlay"
+                />
+              </div>
+            </div>
+
+            <!-- Pie discreto con atajos reales de la consola -->
+            <div
+              class="terminal-chrome flex shrink-0 flex-wrap items-center justify-between gap-x-4 gap-y-1 border-t border-b-0 px-3.5 py-2 font-mono text-[11px] opacity-80"
+            >
+              <div class="flex flex-wrap items-center gap-3">
+                <span><kbd class="font-semibold">Enter</kbd> ejecutar</span>
+                <span aria-hidden="true">·</span>
+                <span><kbd class="font-semibold">Tab</kbd> autocompletar</span>
+                <span aria-hidden="true">·</span>
+                <span><kbd class="font-semibold">↑/↓</kbd> historial (<span id="history-count">0</span>)</span>
+                <span aria-hidden="true">·</span>
+                <span><kbd class="font-semibold">Ctrl+L</kbd> limpiar</span>
+              </div>
+              <span id="terminal-env-indicator">Entorno: Windows PE</span>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <!-- Footer institucional de GhostAcademy -->
+      <footer
+        class="flex shrink-0 flex-col items-start justify-between gap-2 border-t border-slate-200 bg-white px-4 py-2.5 text-xs text-slate-500 sm:flex-row sm:items-center sm:px-6"
+      >
+        <div class="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+          <span class="font-semibold text-slate-800">GhostAcademy</span>
+          <span aria-hidden="true">·</span>
+          <span>BootRescueLab — Simulador educativo de recuperación de arranque</span>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <a
+            href="https://www.unfantasmaenelsistema.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="font-medium text-slate-700 underline decoration-slate-300 underline-offset-2 transition-colors hover:text-sky-700 hover:decoration-sky-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+          >
+            unfantasmaenelsistema.com
+          </a>
+          <span aria-hidden="true" class="text-slate-300">·</span>
+          <span>© 2026 GhostAcademy</span>
+        </div>
+      </footer>
+    </div>
+
+    <!-- Modal CTF de ¡Avería Resuelta! -->
+    <div
+      id="victory-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="victory-modal-title"
+      class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/60 p-4 backdrop-blur-[2px]"
+    >
+      <div class="w-full max-w-lg rounded-xl border border-slate-200 bg-white p-6 shadow-xl">
+        <div class="flex items-start justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <div
+              class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700"
+            >
+              <svg
+                class="h-5 w-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                <polyline points="22 4 12 14.01 9 11.01" />
+              </svg>
+            </div>
+            <div>
+              <div id="victory-case-meta" class="font-mono text-xs font-semibold text-emerald-700">
+                Caso resuelto
+              </div>
+              <h2 id="victory-modal-title" class="text-xl font-bold tracking-tight text-slate-900">
+                ¡Avería Resuelta!
+              </h2>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            id="btn-victory-close"
+            aria-label="Cerrar ventana de victoria"
+            class="flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+          >
+            <svg
+              class="h-4 w-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+
+        <p id="victory-summary" class="mt-4 text-sm leading-relaxed text-slate-600"></p>
+
+        <!-- Bloque de Flag CTF -->
+        <div class="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-3.5">
+          <div class="mb-1.5 flex items-center justify-between gap-2">
+            <span class="text-xs font-semibold text-slate-500">Flag CTF capturada</span>
+            <button
+              type="button"
+              id="btn-copy-flag"
+              class="cursor-pointer rounded border border-slate-300 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 transition-colors hover:border-sky-400 hover:text-sky-700 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-sky-600"
+            >
+              Copiar flag
+            </button>
+          </div>
+          <code
+            id="victory-flag"
+            class="block overflow-x-auto font-mono text-sm font-semibold text-slate-900"
+          ></code>
+        </div>
+
+        <!-- Métricas de desempeño -->
+        <dl class="mt-4 grid grid-cols-3 gap-3 border-y border-slate-200 py-3.5">
+          <div>
+            <dt class="text-xs text-slate-500">Puntuación</dt>
+            <dd id="victory-score" class="mt-0.5 font-mono text-base font-bold text-slate-900 tabular-nums">
+              1000 pts
+            </dd>
+          </div>
+          <div>
+            <dt class="text-xs text-slate-500">Comandos</dt>
+            <dd id="victory-commands" class="mt-0.5 font-mono text-base font-bold text-slate-900 tabular-nums">
+              0
+            </dd>
+          </div>
+          <div>
+            <dt class="text-xs text-slate-500">Progreso total</dt>
+            <dd id="victory-progress" class="mt-0.5 font-mono text-base font-bold text-slate-900 tabular-nums">
+              1 / 3
+            </dd>
+          </div>
+        </dl>
+
+        <div class="mt-5 flex flex-wrap items-center justify-end gap-2.5">
+          <button
+            type="button"
+            id="btn-victory-continue"
+            class="min-h-10 cursor-pointer rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+          >
+            Seguir en consola
+          </button>
+          <button
+            type="button"
+            id="btn-victory-next"
+            class="min-h-10 cursor-pointer rounded-lg bg-sky-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-sky-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+          >
+            Siguiente caso
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

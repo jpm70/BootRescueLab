@@ -1,0 +1,6 @@
+{
+  "name": "BootRescueLab — GhostAcademy",
+  "description": "Aplicación educativa cliente-estática de diagnóstico y consola de rescate de arranque (Windows PE y GRUB Rescue) para el portal GhostAcademy.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
